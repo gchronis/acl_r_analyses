@@ -278,8 +278,6 @@ coeff_df_list <- lapply(lasso_coefs, function(coef_matrix) {
   return(coef_matrix_dense)
 })
 coeff_df <- do.call(cbind, coeff_df_list)
-
-
 print(coeff_df)
 
 
@@ -427,15 +425,21 @@ for (var in feature_names) {
 results <- map_dfr(names(h.wide)[!(names(h.wide) %in% c("x_word", "x_sentence", "x_cluster"))], function(var) {
   model <- multinom(reformulate(var, response = "x_cluster"), data = h.wide)
   summary_model <- summary(model)
+  
   print(summary_model)
   print(coef(summary_model))
-  p_value <- coef(summary_model)["x_cluster0", "Pr(>|t|)"]  
-  coeff <- coef(summary_model)["x_cluster0", "Estimate"]
+  print(coef(summary_model))["1"]
+        
+  p_value <- coef(summary_model)["1", "Pr(>|t|)"]  
+  coeff <- coef(summary_model)["1", "Estimate"]
   r_squared <- summary_model$r.squared
   adj_r_squared <- summary_model$adj.r.squared
   
   tibble(Variable = var, P_Value = p_value, coeff = coeff, r_squared = r_squared, adj_r_squared = adj_r_squared )
 })
+
+
+model <-  multinom(reformulate("tiara", response = "x_cluster"), data = h.wide)
 
 # Adjust p-values for multiple comparisons (optional, e.g., Bonferroni or FDR)
 results <- results %>%
